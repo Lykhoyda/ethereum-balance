@@ -1,0 +1,10 @@
+{
+  "name": "ethereum-balance",
+  "packageManager": "yarn@4.6.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  }
+}
