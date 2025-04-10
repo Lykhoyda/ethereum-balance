@@ -64,6 +64,58 @@ describe('Balance API (e2e)', () => {
     });
   });
 
+  describe('Caching', () => {
+    it('should cache balance responses and not call RPC again within cache TTL', async () => {
+      // First call should hit the RPC
+      const firstResponse = await callBalanceAPI(app, VALID_ETH_ADDRESS).expect(
+        HttpStatus.OK,
+      );
+
+      // Verify RPC calls were made
+      expect(mockPublicClient.getBalance).toHaveBeenCalledTimes(1);
+      expect(mockPublicClient.readContract).toHaveBeenCalledTimes(2); // Once for USDC, once for LINK
+
+      // Reset mock call counts
+      mockPublicClient.getBalance.mockClear();
+      mockPublicClient.readContract.mockClear();
+
+      // Second call should use the cache
+      const secondResponse = await callBalanceAPI(
+        app,
+        VALID_ETH_ADDRESS,
+      ).expect(HttpStatus.OK);
+
+      // Verify no additional RPC calls were made
+      expect(mockPublicClient.getBalance).not.toHaveBeenCalled();
+      expect(mockPublicClient.readContract).not.toHaveBeenCalled();
+
+      // Verify both responses are identical
+      expect(secondResponse.body).toEqual(firstResponse.body);
+
+      // Verify that the timestamp in both responses matches, confirming it's the cached response
+      expect(secondResponse.body.timestamp).toBe(firstResponse.body.timestamp);
+    });
+
+    it('should return fresh data for different addresses', async () => {
+      // First call for one address
+      await callBalanceAPI(app, VALID_ETH_ADDRESS).expect(HttpStatus.OK);
+
+      // Reset mock call counts
+      mockPublicClient.getBalance.mockClear();
+      mockPublicClient.readContract.mockClear();
+
+      // Different address should trigger new RPC calls
+      const differentAddress = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+      await callBalanceAPI(app, differentAddress).expect(HttpStatus.OK);
+
+      // Verify RPC calls were made for the new address
+      expect(mockPublicClient.getBalance).toHaveBeenCalledTimes(1);
+      expect(mockPublicClient.getBalance).toHaveBeenCalledWith({
+        address: differentAddress,
+      });
+    });
+  });
+
   describe('Partial Failures', () => {
     it('should skip ETH if RPC call for ETH fails', async () => {
       mockPublicClient.getBalance.mockRejectedValueOnce(new Error('RPC error'));

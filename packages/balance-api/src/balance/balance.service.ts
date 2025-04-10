@@ -8,6 +8,8 @@ import {
 import ERC20_ABI from '../utils/ERC20ABI';
 import { RPC_PROVIDER_CLIENT } from '../rpc/rpc.module';
 import { TOKENS } from '../config/tokens.config';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class BalanceService {
@@ -16,10 +18,25 @@ export class BalanceService {
   constructor(
     @Inject(RPC_PROVIDER_CLIENT)
     private readonly client: PublicClient,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
 
   async getTokenBalances(address: `0x${string}`): Promise<BalanceResponse> {
     this.logger.log(`Fetching balances for address: ${address}`);
+
+    // Check if cached data exists
+    const cacheKey = `balance:${address}`;
+    const cachedData = await this.cacheManager.get<BalanceResponse>(cacheKey);
+
+    if (cachedData) {
+      this.logger.log(`Returning cached balances for address: ${address}`);
+      return cachedData;
+    }
+
+    this.logger.log(
+      `Cache miss - fetching fresh balances for address: ${address}`,
+    );
 
     // Create parallel promises for each token balance
     const balancePromises = TOKENS.map((token) =>
@@ -38,11 +55,15 @@ export class BalanceService {
       `Successfully fetched ${validResults.length} of ${TOKENS.length} token balances for ${address}`,
     );
 
-    return {
+    const response: BalanceResponse = {
       address,
       balances: validResults,
       timestamp: Date.now(),
     };
+    await this.cacheManager.set(cacheKey, response);
+    this.logger.log(`Stored balances in cache for address: ${address}`);
+
+    return response;
   }
 
   /**
