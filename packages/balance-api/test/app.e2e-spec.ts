@@ -1,25 +1,36 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import {
+  createTestApp,
+  closeTestApp,
+  TestAppContext,
+} from './utils/test-app.utils';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+describe('App (e2e)', () => {
+  let context: TestAppContext;
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    context = await createTestApp();
+    app = context.app;
   });
 
-  it('/ (GET)', () => {
+  afterEach(async () => {
+    await closeTestApp(app);
+  });
+
+  it('should return 404 for non-existent routes', () => {
+    return request(app.getHttpServer()).get('/').expect(HttpStatus.NOT_FOUND);
+  });
+
+  it('should have the /api/balance endpoint available', () => {
+    // We just test that the endpoint exists, without providing an address
+    // This should return a 400 bad request rather than a 404 not found
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .get('/api/balance')
+      .expect(HttpStatus.BAD_REQUEST)
+      .expect((res) => {
+        expect(res.body.message).toContain('Missing "address" query parameter');
+      });
   });
 });
