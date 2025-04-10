@@ -20,7 +20,9 @@ describe('App (e2e)', () => {
   });
 
   it('should return 404 for non-existent routes', () => {
-    return request(app.getHttpServer()).get('/').expect(HttpStatus.NOT_FOUND);
+    return request(app.getHttpServer())
+      .get('/non-existent')
+      .expect(HttpStatus.NOT_FOUND);
   });
 
   it('should have the /api/balance endpoint available', () => {

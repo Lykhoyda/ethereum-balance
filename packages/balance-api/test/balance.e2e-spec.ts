@@ -1,5 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { MOCK_TOKENS, createMockPublicClient } from './mocks/token-config.mock';
+import { createMockPublicClient } from './mocks/token-config.mock';
 import { VALID_ETH_ADDRESS, INVALID_ETH_ADDRESS } from './utils/test-constants';
 import { callBalanceAPI } from './utils/api-requests.utils';
 import {
@@ -12,6 +12,7 @@ import {
   assertEthBalance,
   assertErc20Balances,
 } from './utils/test-assertions.utils';
+import { TOKENS } from '../src/config/tokens.config';
 
 describe('Balance API (e2e)', () => {
   let context: TestAppContext;
@@ -54,7 +55,7 @@ describe('Balance API (e2e)', () => {
         HttpStatus.OK,
       );
 
-      assertValidBalanceResponse(response.body, VALID_ETH_ADDRESS, MOCK_TOKENS);
+      assertValidBalanceResponse(response.body, VALID_ETH_ADDRESS, TOKENS);
       assertEthBalance(response.body);
 
       expect(mockPublicClient.getBalance).toHaveBeenCalledWith({
@@ -72,7 +73,7 @@ describe('Balance API (e2e)', () => {
       );
 
       const balances = response.body.balances;
-      expect(balances.length).toBe(MOCK_TOKENS.length - 1);
+      expect(balances.length).toBe(TOKENS.length - 1);
 
       assertEthBalance(response.body, false);
       assertErc20Balances(response.body);
