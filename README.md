@@ -1,97 +1,70 @@
-# ethereum-balance
+# Ethereum Balance App
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-NETLIFY-SITE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
+A monorepo application for checking Ethereum token balances with a NestJS backend API and React frontend.
 
-A monorepo application for checking Ethereum token balances. This project consists of a NestJS backend API and a React frontend built with Vite.
+## Prerequisites
 
-## Project Structure
+- Node.js v20+
+- Yarn v4+
 
-```
-/
-├── packages/
-│   ├── balance-api/     # NestJS backend API
-│   └── frontend/        # React frontend
-└── tests/              # E2E tests with Playwright
-```
-
-## Development
+## Quick Start
 
 ```bash
 # Install dependencies
 yarn install
 
-# Run both frontend and backend in development mode
+# Start both API and frontend in development mode
 yarn dev
 
-# Run only backend
-yarn dev:api
+# Or run them separately
+yarn dev:api     # Backend only
+yarn dev:frontend # Frontend only
+```
 
-# Run only frontend
-yarn dev:frontend
+## Required Environment Variables
 
+### Backend (packages/balance-api/.env)
+
+```
+# Required for API ("/packages/balance-api/.env")
+INFURA_URL=your_infura_endpoint_url
+```
+
+### Frontend (packages/frontend/.env.local)
+
+```
+VITE_API_URL=http://localhost:3000 # URL to your backend API
+```
+
+## Build for Production
+
+```bash
 # Build both applications
 yarn build
 
-# Run E2E tests
+# Run production build
+yarn workspace balance-api start:prod
+```
+
+## Testing
+
+```bash
+# Unit tests
+yarn workspace balance-api test
+
+# E2E tests (requires both API and frontend running)
 yarn test:e2e
 ```
 
 ## Deployment
 
-### GitHub Actions CI/CD
-
-This project uses GitHub Actions for continuous integration and deployment. The workflow is defined in `.github/workflows/ci-cd.yml`.
-
-The CI/CD pipeline:
-1. Runs on pushes to `main` branch and pull requests
-2. Installs dependencies
-3. Runs linting
-4. Builds both backend and frontend
-5. Runs tests
-6. Deploys the frontend to Netlify (only on `main` branch)
-
-### Netlify Deployment
-
-#### Setup
-
-1. Create a new site on Netlify
-2. Link your GitHub repository
-3. Set the build command to `yarn build`
-4. Set the publish directory to `packages/frontend/dist`
-5. Add environment variables (see below)
-
-#### Environment Variables
-
-Add the following environment variables in Netlify:
-
-- `VITE_API_URL`: URL of your backend API
-- Additional variables as needed for your application
-
-#### GitHub Secrets
-
-Add these secrets to your GitHub repository for automatic deployments:
-
-- `NETLIFY_AUTH_TOKEN`: Your Netlify personal access token
-- `NETLIFY_SITE_ID`: Your Netlify site ID
-
-#### Manual Deployment
-
 ```bash
-# Login to Netlify (first time)
-yarn netlify:login
-
-# Deploy to a preview URL
-yarn deploy
-
-# Deploy to production
-yarn deploy:prod
+# Deploy to Netlify
+yarn netlify:login # First time only
+yarn deploy:prod   # Production deployment
 ```
 
-### Backend Deployment
+### CI/CD
 
-The NestJS backend can be deployed to various platforms:
-
-1. **Render/Heroku/Railway**: Set the build command to `yarn workspace balance-api build` and start command to `yarn workspace balance-api start:prod`
-2. **Docker**: Use the included Dockerfile for containerized deployment
-
-Make sure to set appropriate environment variables for your backend deployment.
+The project is set up with GitHub Actions for CI/CD and deploys to Netlify.
+Required secrets for GitHub: `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`
