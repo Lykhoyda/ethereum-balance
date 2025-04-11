@@ -4,7 +4,17 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "dev": "yarn dev:all",
+    "dev:all": "yarn dev:api & yarn dev:frontend",
+    "dev:api": "yarn workspace balance-api start:dev",
+    "dev:frontend": "yarn workspace ethereum-balance-frontend dev",
+    "build": "yarn workspace balance-api build && yarn workspace ethereum-balance-frontend build",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
   "devDependencies": {
+    "@playwright/test": "^1.51.1",
     "prettier": "^3.5.3"
   },
   "dependencies": {
