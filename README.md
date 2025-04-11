@@ -64,8 +64,3 @@ yarn test:e2e
 yarn netlify:login # First time only
 yarn deploy:prod   # Production deployment
 ```
-
-### CI/CD
-
-The project is set up with GitHub Actions for CI/CD and deploys to Netlify.
-Required secrets for GitHub: `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`
