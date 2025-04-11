@@ -1,9 +1,10 @@
 [build]
 builder = "nixpacks"
-buildCommand = "yarn build"
+buildCommand = "npm run build"
+watchPatterns = ["**/*.ts", "**/*.js", "**/*.json"]
 
 [deploy]
-startCommand = "node dist/main.js"
+startCommand = "npm run start:prod"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
