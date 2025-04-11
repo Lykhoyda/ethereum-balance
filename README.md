@@ -44,6 +44,7 @@ yarn build
 
 # Run production build
 yarn workspace balance-api start:prod
+yarn workspace frontend preview
 ```
 
 ## Testing
@@ -55,12 +56,4 @@ yarn workspace balance-api test:integration
 # E2E tests (requires both API and frontend running)
 yarn dev
 yarn test:e2e
-```
-
-## Deployment
-
-```bash
-# Deploy to Netlify
-yarn netlify:login # First time only
-yarn deploy:prod   # Production deployment
 ```
