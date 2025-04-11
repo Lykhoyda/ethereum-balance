@@ -1,7 +1,7 @@
 import { ApiBalanceResponse } from './types'
 import { getAddress, isAddress } from 'viem'
 
-const API_BASE_URL = '/api'
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`
 
 /**
  * Common API error status codes
