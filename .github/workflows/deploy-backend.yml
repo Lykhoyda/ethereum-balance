@@ -29,3 +29,4 @@ jobs:
         run: railway up --service=ethereum-balance-api
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
