@@ -1,0 +1,138 @@
+name: E2E Tests
+
+on:
+  # Run on schedule to ensure tests remain valid
+  schedule:
+    - cron: '0 0 * * 1'  # Run at midnight on Monday
+  # Allow manual triggering
+  workflow_dispatch:
+  # Run in pull requests to ensure changes don't break tests
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'tests/**'
+      - 'playwright.config.ts'
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.51.1-jammy
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          
+      - name: Install dependencies
+        run: yarn install --immutable
+        
+      - name: Build application
+        run: yarn build
+        
+      # Set up test environment specifically for CI
+      - name: Create CI environment configuration
+        run: |
+          echo "NODE_ENV=test" > packages/balance-api/.env.test
+          echo "VITE_API_URL=http://localhost:3000" > packages/frontend/.env.test
+          echo "VITE_APP_ENV=test" >> packages/frontend/.env.test
+        
+      # Start both services with proper logging
+      - name: Start backend API
+        run: |
+          yarn workspace balance-api start > backend.log 2>&1 &
+          echo $! > backend.pid
+        env:
+          NODE_ENV: test
+          PORT: 3000
+          
+      # Verify backend health
+      - name: Wait for backend
+        run: |
+          echo "Waiting for backend to be available..."
+          for i in {1..60}; do
+            if curl -s http://localhost:3000/health --max-time 2 > /dev/null; then
+              echo "Backend is ready!"
+              break
+            fi
+            
+            if [ $i -eq 60 ]; then
+              echo "Backend failed to start within timeout"
+              cat backend.log
+              exit 1
+            fi
+            
+            echo "Attempt $i: Backend not ready yet, waiting..."
+            sleep 2
+          done
+          
+      - name: Start frontend
+        run: |
+          yarn workspace ethereum-balance-frontend dev > frontend.log 2>&1 &
+          echo $! > frontend.pid
+        env:
+          NODE_ENV: test
+          VITE_API_URL: http://localhost:3000
+          
+      # Verify frontend health
+      - name: Wait for frontend
+        run: |
+          echo "Waiting for frontend to be available..."
+          for i in {1..60}; do
+            if curl -s http://localhost:5173 --max-time 2 > /dev/null; then
+              echo "Frontend is ready!"
+              break
+            fi
+            
+            if [ $i -eq 60 ]; then
+              echo "Frontend failed to start within timeout"
+              cat frontend.log
+              exit 1
+            fi
+            
+            echo "Attempt $i: Frontend not ready yet, waiting..."
+            sleep 2
+          done
+          
+      # Run the tests with retries
+      - name: Run Playwright tests
+        run: yarn test:e2e --retries=2
+        env:
+          CI: true
+          
+      # Capture and upload logs if tests fail
+      - name: Capture logs on failure
+        if: failure()
+        run: |
+          echo "===== BACKEND LOGS ====="
+          cat backend.log
+          echo "===== FRONTEND LOGS ====="
+          cat frontend.log
+          
+      # Upload test reports regardless of test outcome
+      - name: Upload Playwright test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          
+      # Clean up processes
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
+          fi
+          if [ -f frontend.pid ]; then
+            kill $(cat frontend.pid) || true
+          fi

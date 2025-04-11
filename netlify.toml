@@ -1,0 +1,39 @@
+[build]
+  base = "/"
+  command = "yarn build"
+  publish = "packages/frontend/dist"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF packages/frontend/"
+
+[build.environment]
+  NODE_VERSION = "20"
+  YARN_VERSION = "4.6.0"
+  CI = "true"
+
+# Production context: all deploys from the main branch 
+# will inherit these settings
+[context.production]
+  environment = { NODE_ENV = "production" }
+
+# Deploy Preview context: all deploys generated from a pull/merge request
+[context.deploy-preview]
+  environment = { NODE_ENV = "production" }
+
+# Specific branch context: deploys from this branch
+[context.develop]
+  environment = { NODE_ENV = "development" }
+
+# Redirects for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and caching
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.netlify.app https://api.etherscan.io"

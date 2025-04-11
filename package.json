@@ -11,10 +11,15 @@
     "dev:frontend": "yarn workspace ethereum-balance-frontend dev",
     "build": "yarn workspace balance-api build && yarn workspace ethereum-balance-frontend build",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "deploy": "netlify deploy",
+    "deploy:prod": "netlify deploy --prod",
+    "deploy:preview": "netlify deploy --alias=preview",
+    "netlify:login": "netlify login"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
+    "netlify-cli": "^20.0.0",
     "prettier": "^3.5.3"
   },
   "dependencies": {
