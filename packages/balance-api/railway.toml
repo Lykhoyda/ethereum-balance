@@ -1,0 +1,14 @@
+[build]
+builder = "nixpacks"
+buildCommand = "yarn build"
+
+[deploy]
+startCommand = "node dist/main.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+
+[environments]
+  [environments.production]
+    numReplicas = 1
+    domain = { enabled = true }
