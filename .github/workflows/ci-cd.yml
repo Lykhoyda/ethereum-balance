@@ -58,54 +58,10 @@ jobs:
 
       - name: Build application
         run: yarn build
-        
-      # Start both services in the background
-      - name: Start backend API
-        run: yarn workspace balance-api start &
-        env:
-          NODE_ENV: test
-          PORT: 3000
-      
-      # Wait for backend to be available
-      - name: Wait for backend
-        run: |
-          echo "Waiting for backend to be available..."
-          timeout=60
-          counter=0
-          while ! curl -s http://localhost:3000 > /dev/null; do
-            if [ $counter -ge $timeout ]; then
-              echo "Backend failed to start within $timeout seconds"
-              exit 1
-            fi
-            echo "Waiting..."
-            sleep 2
-            counter=$((counter+2))
-          done
-          echo "Backend is available!"
-      
-      - name: Start frontend
-        run: yarn workspace ethereum-balance-frontend dev &
-        env:
-          NODE_ENV: test
-          VITE_API_URL: http://localhost:3000
-      
-      # Wait for frontend to be available
-      - name: Wait for frontend
-        run: |
-          echo "Waiting for frontend to be available..."
-          timeout=60
-          counter=0
-          while ! curl -s http://localhost:5173 > /dev/null; do
-            if [ $counter -ge $timeout ]; then
-              echo "Frontend failed to start within $timeout seconds"
-              exit 1
-            fi
-            echo "Waiting..."
-            sleep 2
-            counter=$((counter+2))
-          done
-          echo "Frontend is available!"
-          
+
+      - name: Run in Dev mode
+        run: yarn dev
+
       - name: Run Playwright tests
         run: yarn test:e2e
         env:
