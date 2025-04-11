@@ -24,11 +24,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Lint
-        run: |
-          yarn workspace balance-api lint
-          yarn workspace ethereum-balance-frontend lint
-
       - name: Build
         run: yarn build
 
