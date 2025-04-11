@@ -3,7 +3,7 @@ name: E2E Tests
 on:
   # Run on schedule to ensure tests remain valid
   schedule:
-    - cron: '0 0 * * 1'  # Run at midnight on Monday
+    - cron: '0 0 * * 1' # Run at midnight on Monday
   # Allow manual triggering
   workflow_dispatch:
   # Run in pull requests to ensure changes don't break tests
@@ -19,33 +19,32 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.51.1-jammy
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
-          
+
       - name: Enable corepack
         run: corepack enable
-        
+
       - name: Install dependencies
         run: yarn install --immutable
-        
+
       - name: Build application
         run: yarn build
-        
+
       # Set up test environment specifically for CI
       - name: Create CI environment configuration
         run: |
           echo "NODE_ENV=test" > packages/balance-api/.env.test
           echo "VITE_API_URL=http://localhost:3000" > packages/frontend/.env.test
           echo "VITE_APP_ENV=test" >> packages/frontend/.env.test
-        
+
       # Start both services with proper logging
       - name: Start backend API
         run: |
@@ -54,7 +53,7 @@ jobs:
         env:
           NODE_ENV: test
           PORT: 3000
-          
+
       # Verify backend health
       - name: Wait for backend
         run: |
@@ -74,7 +73,7 @@ jobs:
             echo "Attempt $i: Backend not ready yet, waiting..."
             sleep 2
           done
-          
+
       - name: Start frontend
         run: |
           yarn workspace ethereum-balance-frontend dev > frontend.log 2>&1 &
@@ -82,7 +81,7 @@ jobs:
         env:
           NODE_ENV: test
           VITE_API_URL: http://localhost:3000
-          
+
       # Verify frontend health
       - name: Wait for frontend
         run: |
@@ -102,13 +101,13 @@ jobs:
             echo "Attempt $i: Frontend not ready yet, waiting..."
             sleep 2
           done
-          
+
       # Run the tests with retries
       - name: Run Playwright tests
         run: yarn test:e2e --retries=2
         env:
           CI: true
-          
+
       # Capture and upload logs if tests fail
       - name: Capture logs on failure
         if: failure()
@@ -117,7 +116,7 @@ jobs:
           cat backend.log
           echo "===== FRONTEND LOGS ====="
           cat frontend.log
-          
+
       # Upload test reports regardless of test outcome
       - name: Upload Playwright test results
         if: always()
@@ -128,7 +127,7 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
-          
+
       # Clean up processes
       - name: Cleanup
         if: always()

@@ -53,6 +53,7 @@ yarn workspace balance-api start:prod
 yarn workspace balance-api test
 
 # E2E tests (requires both API and frontend running)
+yarn dev
 yarn test:e2e
 ```
 
