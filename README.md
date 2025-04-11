@@ -1,4 +1,5 @@
 # Ethereum Balance App
+https://ethereum-balance.netlify.app/
 
 A monorepo application for checking Ethereum token balances with a NestJS backend API and React frontend.
 
