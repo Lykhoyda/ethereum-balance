@@ -28,7 +28,7 @@ jobs:
         run: yarn build
 
       - name: Run tests
-        run: yarn workspace balance-api test
+        run: yarn workspace balance-api test:integration
 
       - name: Archive frontend build
         uses: actions/upload-artifact@v4

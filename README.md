@@ -49,8 +49,8 @@ yarn workspace balance-api start:prod
 ## Testing
 
 ```bash
-# Unit tests
-yarn workspace balance-api test
+# Integration tests
+yarn workspace balance-api test:integration
 
 # E2E tests (requires both API and frontend running)
 yarn dev

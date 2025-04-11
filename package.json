@@ -10,7 +10,7 @@
     "dev:api": "yarn workspace balance-api start:dev",
     "dev:frontend": "yarn workspace ethereum-balance-frontend dev",
     "build": "yarn workspace balance-api build && yarn workspace ethereum-balance-frontend build",
-    "test:e2e": "playwright test",
+    "test:integration": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "deploy": "netlify deploy",
     "deploy:prod": "netlify deploy --prod",
