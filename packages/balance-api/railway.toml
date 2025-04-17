@@ -1,9 +1,20 @@
+[phases.install]
+cmds = [
+    "corepack enable",
+    "corepack prepare yarn@4.9.1 --activate",
+    "yarn install"
+]
+
 [build]
 builder = "nixpacks"
-buildCommand = "npm run build"
+buildCommand = "yarn run build"
 
 [deploy]
-startCommand = "npm run start:prod"
+startCommand = "yarn run start:prod"
+restartPolicyMaxRetries = 2
+
+[variables]
+NODE_VERSION = "20"
 
 [environments]
   [environments.production]
