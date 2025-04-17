@@ -1,5 +1,6 @@
 [phases.setup]
 nixPkgs = ["nodejs_20"]
+aptPkgs = ["yarn"]
 
 
 [phases.install]
@@ -12,6 +13,9 @@ cmds = [
 [build]
 builder = "nixpacks"
 buildCommand = "yarn run build"
+
+[nixpacks]
+packageManager = "yarn"
 
 [deploy]
 startCommand = "yarn run start:prod"
