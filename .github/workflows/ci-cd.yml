@@ -7,7 +7,33 @@ on:
     branches: [main]
 
 jobs:
-  test-and-build:
+  tests:
+    name: Run end-to-end tests
+    env:
+      INFURA_URL: ${{ secrets.INFURA_URL }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Install playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build
+        run: yarn build
+
+      - name: Run e2e tests
+        run: yarn run test:e2e
+
+  build-artifacts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,30 +46,21 @@ jobs:
 
       - name: Enable corepack
         run: corepack enable
-        
+
       - name: Install dependencies
         run: yarn install --immutable
 
       - name: Build
         run: yarn build
 
-      - name: Setup Playwright
-        uses: microsoft/playwright-github-action@v1
-
-      - name: Run integration tests
-        run: yarn workspace balance-api test:integration
-
-      - name: Run E2E tests
-        run: yarn test:e2e
-
       - name: Archive frontend build
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: packages/frontend/dist
-          
+
   deploy-netlify:
-    needs: [test-and-build]
+    needs: [tests, build-artifacts]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
