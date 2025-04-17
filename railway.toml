@@ -10,10 +10,10 @@ commands = [
 ]
 
 [phases.build]
-cmds = ["yarn build"]
+cmds = ["yarn build:backend"]
 
 [deploy]
-startCommand = "node dist/main.js"
+startCommand = "yarn run start:prod"
 restartPolicyMaxRetries = 2
 
 [nixpacks]

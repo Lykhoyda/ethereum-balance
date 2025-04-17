@@ -13,6 +13,7 @@
     "dev:api": "yarn workspace balance-api start:dev",
     "dev:frontend": "yarn workspace ethereum-balance-frontend dev",
     "build": "yarn workspace balance-api build && yarn workspace ethereum-balance-frontend build",
+    "build:backend": "yarn workspace balance-api build",
     "start": "yarn workspace balance-api start & yarn workspace ethereum-balance-frontend preview",
     "start:frontend": "yarn workspace ethereum-balance-frontend preview",
     "start:backend": "yarn workspace balance-api start",
