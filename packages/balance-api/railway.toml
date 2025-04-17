@@ -1,24 +1,19 @@
 [phases.setup]
-nixPkgs = ["nodejs_20"]
-aptPkgs = ["yarn"]
-
-
-[phases.install]
+nixPkgs = ["nodejs_20"]                  # Yarn no longer needed here
 cmds = [
     "corepack enable",
-    "corepack prepare yarn@4.9.1 --activate",
-    "yarn install"
+    "corepack prepare yarn@4.9.1 --activate"
 ]
 
-[build]
-builder = "nixpacks"
-buildCommand = "yarn run build"
+[phases.install]
+cmds = ["yarn install --immutable"]
 
-[nixpacks]
-packageManager = "yarn"
+[phases.build]
+cmds = ["yarn build"]
 
 [deploy]
-startCommand = "yarn run start:prod"
+# Call the compiled entrypoint, bypassing Yarn entirely
+startCommand = "node dist/main.js"
 restartPolicyMaxRetries = 2
 
 [environments]
