@@ -1,3 +1,7 @@
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+
 [phases.install]
 cmds = [
     "corepack enable",
@@ -12,9 +16,6 @@ buildCommand = "yarn run build"
 [deploy]
 startCommand = "yarn run start:prod"
 restartPolicyMaxRetries = 2
-
-[variables]
-NODE_VERSION = "20"
 
 [environments]
   [environments.production]
