@@ -42,13 +42,12 @@ export function useAddressForm() {
   }
 
   // Derive error message directly
-  const errorMessage = isError && queryError
-    ? isApiError(queryError)
-      ? queryError.message
-      : queryError instanceof Error
+  const errorMessage =
+    isError && queryError
+      ? isApiError(queryError)
         ? queryError.message
         : 'An unexpected error occurred'
-    : null
+      : null
 
   return {
     inputValue,
