@@ -12,17 +12,17 @@
     "build": "yarn workspace balance-api build && yarn workspace ethereum-balance-frontend build",
     "test:integration": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e": "playwright test",
     "deploy": "netlify deploy",
     "deploy:prod": "netlify deploy --prod",
     "deploy:preview": "netlify deploy --alias=preview",
-    "netlify:login": "netlify login"
+    "netlify:login": "netlify login",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
+    "husky": "^9.0.11",
     "netlify-cli": "^20.0.0",
     "prettier": "^3.5.3"
-  },
-  "dependencies": {
-    "@tanstack/react-query": "^5.72.2"
   }
 }
